@@ -1,16 +1,19 @@
+import asyncio
 import os
 from pathlib import Path
+
+from agents import Agent, Runner, function_tool, set_default_openai_key
 from dotenv import load_dotenv
+
+
 def load_configuration() -> None:
     load_dotenv(Path(__file__).resolve().with_name(".env"), override=False)
-    if not os.getenv("OPENAI_API_KEY", "").strip():
+    api_key = os.getenv("OPENAI_API_KEY", "").strip()
+    if not api_key:
         raise SystemExit(
             "Falta OPENAI_API_KEY. Configurala en .env o en las variables del entorno."
         )
-
-import asyncio
-
-from agents import Agent, Runner, function_tool
+    set_default_openai_key(api_key)
 
 
 @function_tool
@@ -27,6 +30,7 @@ agent = Agent(
 
 
 async def main() -> None:
+    load_configuration()
     result = await Runner.run(
         agent,
         "Tell me something surprising about ancient life on Earth.",
