@@ -1,5 +1,6 @@
 # Agente-PYTHON
-Una App que utiliza un LLM para ejecutar funciones y tools
+Una app que utiliza un LLM para derivar preguntas de historia y matemáticas
+a agentes especialistas.
 
 ## Ejecución local
 

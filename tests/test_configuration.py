@@ -18,7 +18,10 @@ class ConfigurationTests(unittest.IsolatedAsyncioTestCase):
         self.run_agent = self.enterContext(
             patch.object(main.Runner, "run", new_callable=AsyncMock)
         )
-        self.run_agent.return_value = SimpleNamespace(final_output="Resultado de prueba")
+        self.run_agent.return_value = SimpleNamespace(
+            final_output="Resultado de prueba",
+            last_agent=SimpleNamespace(name="Math tutor"),
+        )
         self.enterContext(patch("builtins.print"))
 
     async def test_dotenv_key_is_configured_before_agent_runs(self) -> None:
@@ -28,7 +31,10 @@ class ConfigurationTests(unittest.IsolatedAsyncioTestCase):
 
         async def check_configuration(*args: object, **kwargs: object) -> SimpleNamespace:
             self.configure_key.assert_called_once_with("test-only-dotenv-value")
-            return SimpleNamespace(final_output="Resultado de prueba")
+            return SimpleNamespace(
+                final_output="Resultado de prueba",
+                last_agent=SimpleNamespace(name="Math tutor"),
+            )
 
         self.run_agent.side_effect = check_configuration
         await main.main()
