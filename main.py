@@ -1,10 +1,7 @@
 import asyncio
 import os
 from pathlib import Path
-
-from agents import Agent, Runner, function_tool, set_default_openai_key
 from dotenv import load_dotenv
-
 
 def load_configuration() -> None:
     load_dotenv(Path(__file__).resolve().with_name(".env"), override=False)
@@ -15,6 +12,11 @@ def load_configuration() -> None:
         )
     set_default_openai_key(api_key)
 
+
+###  AQUI COMIENZA EL CODIGO PARA PROBAR ###
+
+
+from agents import Agent, Runner, function_tool, set_default_openai_key
 
 @function_tool
 def history_fun_fact() -> str:
