@@ -12,36 +12,31 @@ def load_configuration() -> None:
             "Falta OPENAI_API_KEY. Configurala en .env o en las variables del entorno."
         )
     set_default_openai_key(api_key)
-
+load_configuration()
 ###  AQUI COMIENZA EL CODIGO PARA PROBAR ###
 
-history_tutor = Agent(
-    name="History tutor",
-    handoff_description="Specialist for history questions.",
-    instructions="Answer history questions clearly and concisely.",
-)
 
-math_tutor = Agent(
-    name="Math tutor",
-    handoff_description="Specialist for math questions.",
-    instructions="Explain math step by step and include worked examples.",
-)
+from pydantic import BaseModel
 
-triage_agent = Agent(
-    name="Homework triage",
-    instructions="Route each homework question to the right specialist.",
-    handoffs=[history_tutor, math_tutor],
+class CalendarEvent(BaseModel):
+    name: str
+    date: str
+    participants: list[str]
+
+
+agent = Agent(
+    name="Calendar extractor",
+    instructions="Extract calendar events from text.",
+    output_type=CalendarEvent,
 )
 
 
 async def main() -> None:
-    load_configuration()
     result = await Runner.run(
-        triage_agent,
-        "What is a circunference ?",
+        agent,
+        "Dinner with Priya and Sam on Friday.",
     )
     print(result.final_output)
-    print(result.last_agent.name)
 
 
 if __name__ == "__main__":
