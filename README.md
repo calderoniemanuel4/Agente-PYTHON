@@ -32,6 +32,9 @@ La ejecución requiere acceso al modelo configurado y puede consumir saldo de la
 una temperatura simulada de 18 °C, marcada como dato ficticio. Hace una segunda
 llamada a la API para que el modelo redacte la respuesta; no consulta el clima real.
 
+`python scripts/agent.py` usa el Agents SDK. Carga la misma clave desde `.env`
+y la configura con `set_default_openai_key` antes de ejecutar `Runner.run`.
+
 `.env` está excluido de Git.
 Los secretos se guardan como texto local, por lo que no deben incluirse en logs ni commits.
 
@@ -39,6 +42,7 @@ Dependencias: `openai==3.37.0`, `openai-agents==0.24.0` y `python-dotenv==1.2.1`
 Referencia oficial: [python-dotenv](https://github.com/theskumar/python-dotenv/tree/v1.2.1).
 Configuración de la clave: [OpenAI Developer Quickstart](https://developers.openai.com/api/docs/quickstart).
 Uso de tokens: [referencia oficial de Responses API](https://developers.openai.com/api/reference/python/resources/responses/methods/create).
+Configuración de Agents SDK: [quickstart oficial](https://developers.openai.com/api/docs/guides/agents/quickstart?lang=python).
 
 ## Pruebas locales
 
