@@ -1,6 +1,8 @@
 # Agente-PYTHON
 Un ejemplo de llamada a la Responses API de OpenAI desde Python.
 
+Para empezar el roadmap sin usar la API, seguí el [laboratorio de la semana 1](docs/semana-1.md).
+
 ## Ejecución local
 
 Requiere Python 3.10 o superior.
