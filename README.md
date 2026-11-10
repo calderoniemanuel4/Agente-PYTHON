@@ -2,6 +2,7 @@
 Un ejemplo de llamada a la Responses API de OpenAI desde Python.
 
 Para empezar el roadmap sin usar la API, seguí el [laboratorio de la semana 1](docs/semana-1.md).
+Las consultas del recorrido están en las [notas e informe de avance de la semana 1](docs/semana-1-notas.md).
 
 ## Ejecución local
 

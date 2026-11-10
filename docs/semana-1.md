@@ -1,5 +1,8 @@
 # Semana 1 · ¿Quién ejecuta la herramienta?
 
+Las consultas y explicaciones surgidas durante el recorrido están en las
+[notas, observaciones e informe de avance](semana-1-notas.md).
+
 El primer módulo del roadmap abarca dos semanas. En este primer ejercicio,
 simulás la propuesta del modelo y observás cómo Python decide si la ejecuta.
 Los pedidos son ficticios. No necesitás una API key.
