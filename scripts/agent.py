@@ -1,10 +1,8 @@
 import asyncio
 import os
 from pathlib import Path
-
 from agents import Agent, Runner, set_default_openai_key
 from dotenv import load_dotenv
-
 
 def load_configuration() -> str:
     load_dotenv(Path(__file__).resolve().parent.parent / ".env", override=False)
@@ -14,7 +12,6 @@ def load_configuration() -> str:
             "Falta OPENAI_API_KEY. Configurala en .env o en las variables del entorno."
         )
     return api_key
-
 
 spanish_agent = Agent(
     name="Spanish agent",

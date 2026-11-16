@@ -2,7 +2,7 @@
 
 > Apuntes de trabajo sobre la documentación oficial de OpenAI para este proyecto Python.
 >
-> Actualizado: 2026-10-27
+> Actualizado: 2026-10-29
 
 ---
 
@@ -132,6 +132,46 @@ def get_weather(location: str) -> dict[str, str | int | bool]:
 El valor `18` es inventado: una versión real tendría que consultar un proveedor meteorológico. La marca `simulated: True` y el prompt del ejemplo indican al modelo que no presente esa cifra como clima actual. El programa usa el mismo `call_id` para asociar el resultado con la llamada original.
 
 El script fuerza el uso de `get_weather` con `tool_choice={"type": "function", "name": "get_weather"}`. Aun así, recorre `response.output` y revisa el `type` de cada elemento, porque la respuesta puede contener otros tipos de elementos además de la llamada.
+
+---
+
+## 5. Elegir el modelo LLM
+
+**Fuentes oficiales:** [guía de selección de modelos](https://developers.openai.com/api/docs/guides/model-selection) y [catálogo de modelos](https://developers.openai.com/api/docs/models).
+
+En `client.responses.create(...)`, `model` indica **qué modelo procesa el `input`**. Estos cuatro son opciones de la familia GPT-6; sus nombres completos importan porque `Sol` y `Terra` usan la versión `6.1`:
+
+| Modelo | ID para la API | Cuándo usarlo |
+| --- | --- | --- |
+| Luna | `gpt-6-luna` | Tareas concretas, frecuentes o de gran volumen, donde importan la velocidad y el costo. |
+| Terra | `gpt-6.1-terra` | Redacción clara y breve, análisis visual o tareas acotadas con interfaz. |
+| Sol | `gpt-6.1-sol` | Trabajo complejo que necesita un equilibrio entre capacidad, tiempo y costo. |
+| Astra | `gpt-6-astra` | Razonamiento profundo, problemas ambiguos y trabajo técnico o profesional exigente. |
+
+En el ejemplo `model="gpt-6-astra"` selecciona Astra para escribir un cuento. **Para un cuento breve**, probaría primero Terra si interesa la calidad de la redacción, o Luna si se van a generar muchos cuentos; reservaría Astra para instrucciones creativas más exigentes. Esta elección es una recomendación práctica basada en la guía, no una regla fija. Cambiar el ID modifica el modelo solicitado y puede cambiar la calidad, latencia y costo de la respuesta.
+
+```python
+client = OpenAI(api_key=load_configuration())
+response = client.responses.create(
+    model="gpt-6-astra",
+    input="Write a short bedtime story about a unicorn in spanish language",
+)
+```
+
+---
+
+## 6. Responses API y Agents SDK
+
+**Fuente oficial:** [OpenAI Developer: Agents](https://developers.openai.com/api/docs/guides/agents) y [Agents SDK](https://developers.openai.com/api/docs/guides/agents/sdk).
+
+Ambos permiten usar modelos de OpenAI desde Python. La diferencia práctica es **quién coordina los pasos**:
+
+| Opción | Cuándo usarla | Ejemplo en este proyecto |
+| --- | --- | --- |
+| **Responses API** (`client.responses.create`) | Para llamar al modelo directamente y controlar cada solicitud y respuesta. Si hay function calling, el programa procesa la llamada, ejecuta la función y envía su resultado en otra solicitud. | [uso de tokens.py](scripts/uso%20de%20tokens.py) hace una consulta; [tools.py](scripts/tools.py) implementa manualmente dos pasos de function calling. |
+| **Agents SDK** (`Agent` y `Runner.run`) | Para definir agentes con instrucciones, herramientas y derivaciones entre especialistas. El SDK se encarga del ciclo de ejecución y de invocar las herramientas configuradas. | [agent.py](scripts/agent.py) deriva entre agentes de español e inglés. |
+
+**Regla práctica:** empezar con Responses para una llamada sencilla; usar Agents SDK cuando el flujo necesita varias herramientas, pasos o derivaciones y conviene que el SDK los coordine. El Agents SDK se ejecuta dentro de nuestra aplicación y utiliza las API de modelos de OpenAI.
 
 ---
 

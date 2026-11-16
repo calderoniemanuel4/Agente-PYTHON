@@ -17,7 +17,7 @@ def load_configuration() -> str:
 client = OpenAI(api_key=load_configuration())
 
 response = client.responses.create(
-    model="gpt-6-astra",
+    model="gpt-6.1-sol",
     input=[
         {
             "role": "user",
