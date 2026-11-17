@@ -1,5 +1,7 @@
+import io
 import json
 import unittest
+from contextlib import redirect_stderr
 from types import SimpleNamespace
 from unittest.mock import Mock, patch
 
@@ -15,8 +17,17 @@ class PedidosAPITests(unittest.TestCase):
             SimpleNamespace(id="turno-1", output=[llamada]),
             SimpleNamespace(output_text="El pedido fue enviado."),
         ]
-        self.assertEqual(preguntar(client, "¿Y el PED-002?", modelo="test", permite_lectura=True),
-                         "El pedido fue enviado.")
+        traza = io.StringIO()
+        with redirect_stderr(traza):
+            self.assertEqual(
+                preguntar(client, "¿Y el PED-002?", modelo="test",
+                          permite_lectura=True, mostrar_flujo=True),
+                "El pedido fue enviado.",
+            )
+        self.assertIn("El modelo solicita consultar_estado_pedido (call_id=consulta-1)",
+                      traza.getvalue())
+        self.assertIn("Python valida y ejecuta la función", traza.getvalue())
+        self.assertIn("El modelo recibe el resultado con call_id=consulta-1", traza.getvalue())
         segunda = client.responses.create.call_args.kwargs
         self.assertEqual(segunda["previous_response_id"], "turno-1")
         salida, = segunda["input"]
@@ -26,10 +37,15 @@ class PedidosAPITests(unittest.TestCase):
     def test_aclaracion_no_ejecuta_herramientas(self):
         client = Mock()
         client.responses.create.return_value = SimpleNamespace(output=[], output_text="¿Qué ID?")
-        with patch("labs.pedidos_api.ejecutar_propuesta") as ejecutar:
-            self.assertEqual(preguntar(client, "¿Ya salió?", modelo="test", permite_lectura=True),
-                             "¿Qué ID?")
+        traza = io.StringIO()
+        with patch("labs.pedidos_api.ejecutar_propuesta") as ejecutar, redirect_stderr(traza):
+            self.assertEqual(
+                preguntar(client, "¿Ya salió?", modelo="test",
+                          permite_lectura=True, mostrar_flujo=True),
+                "¿Qué ID?",
+            )
             ejecutar.assert_not_called()
+        self.assertIn("El modelo responde sin solicitar la herramienta", traza.getvalue())
         client.responses.create.assert_called_once()
 
     def test_sin_permiso_no_contacta_al_modelo(self):

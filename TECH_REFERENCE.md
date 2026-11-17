@@ -177,4 +177,6 @@ Ambos permiten usar modelos de OpenAI desde Python. La diferencia práctica es *
 
 ## Próximos apuntes
 
-Agregar nuevas secciones a medida que avance el Quickstart y anotar en cada una la fuente oficial consultada.
+Agregar nuevas secciones a medida que avance el Quickstart. Cada nota nueva debe
+indicar su fecha (`AAAA-MM-DD`), una explicación breve y la fuente oficial
+consultada. Si se amplía en otro día, registrar también la fecha de la ampliación.

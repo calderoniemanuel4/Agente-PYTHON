@@ -13,7 +13,14 @@ from pydantic import ValidationError
 from labs.pedidos import ConsultaPedido, ejecutar_propuesta
 
 
-def preguntar(client: OpenAI, pregunta: str, *, modelo: str, permite_lectura: bool) -> str:
+def preguntar(
+    client: OpenAI,
+    pregunta: str,
+    *,
+    modelo: str,
+    permite_lectura: bool,
+    mostrar_flujo: bool = False,
+) -> str:
     if not permite_lectura:
         raise PermissionError("No hay permiso para consultar pedidos.")
 
@@ -24,6 +31,11 @@ def preguntar(client: OpenAI, pregunta: str, *, modelo: str, permite_lectura: bo
         "parameters": ConsultaPedido.model_json_schema(),
         "strict": True,
     }
+    if mostrar_flujo:
+        print(
+            "1. Python envía la pregunta y el contrato de la herramienta.",
+            file=sys.stderr,
+        )
     propuesta = client.responses.create(
         model=modelo,
         instructions=(
@@ -36,15 +48,31 @@ def preguntar(client: OpenAI, pregunta: str, *, modelo: str, permite_lectura: bo
     )
     llamadas = [item for item in propuesta.output if item.type == "function_call"]
     if not llamadas:
+        if mostrar_flujo:
+            print(
+                "2. El modelo responde sin solicitar la herramienta.",
+                file=sys.stderr,
+            )
         return propuesta.output_text or "No se recibió una respuesta del modelo."
     if len(llamadas) != 1:
         raise ValueError("El laboratorio admite una consulta por turno.")
     llamada = llamadas[0]
-    resultado = ejecutar_propuesta(llamada.name, llamada.arguments, permite_lectura=permite_lectura)
+    if mostrar_flujo:
+        print(
+            f"2. El modelo solicita {llamada.name} (call_id={llamada.call_id}).",
+            file=sys.stderr,
+        )
+    resultado = ejecutar_propuesta(
+        llamada.name, llamada.arguments, permite_lectura=permite_lectura
+    )
+    if mostrar_flujo:
+        print(f"3. Python valida y ejecuta la función: {resultado}.", file=sys.stderr)
     final = client.responses.create(
         model=modelo,
         previous_response_id=propuesta.id,
-        instructions="Respondé en español usando el resultado de la consulta ficticia.",
+        instructions=(
+            "Respondé en español usando el resultado de la consulta ficticia."
+        ),
         input=[{
             "type": "function_call_output",
             "call_id": llamada.call_id,
@@ -53,6 +81,11 @@ def preguntar(client: OpenAI, pregunta: str, *, modelo: str, permite_lectura: bo
         tools=[herramienta],
         tool_choice="none",
     )
+    if mostrar_flujo:
+        print(
+            f"4. El modelo recibe el resultado con call_id={llamada.call_id}.",
+            file=sys.stderr,
+        )
     return final.output_text or "No se recibió una respuesta final del modelo."
 
 
@@ -60,6 +93,7 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("pregunta")
     parser.add_argument("--sin-permiso", action="store_true")
+    parser.add_argument("--mostrar-flujo", action="store_true")
     args = parser.parse_args()
     load_dotenv(Path(__file__).resolve().parents[1] / ".env", override=False)
     if args.sin_permiso:
@@ -68,8 +102,15 @@ def main() -> None:
         sys.exit("Falta OPENAI_API_KEY en .env o en el entorno.")
     try:
         with OpenAI(timeout=30, max_retries=0) as client:
-            print(preguntar(client, args.pregunta, modelo=os.getenv("OPENAI_MODEL") or "gpt-6-astra",
-                            permite_lectura=not args.sin_permiso))
+            print(
+                preguntar(
+                    client,
+                    args.pregunta,
+                    modelo=os.getenv("OPENAI_MODEL") or "gpt-6-astra",
+                    permite_lectura=not args.sin_permiso,
+                    mostrar_flujo=args.mostrar_flujo,
+                )
+            )
     except ValidationError:
         sys.exit("El modelo propuso argumentos inválidos para consultar el pedido.")
     except (ValueError, PermissionError) as error:

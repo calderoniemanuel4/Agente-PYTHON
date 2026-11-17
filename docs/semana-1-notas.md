@@ -5,6 +5,19 @@ Complementa la [guía práctica de la semana 1](semana-1.md), donde están los
 ejercicios y comandos para ejecutar. Este archivo reúne explicaciones de
 Python, validación y uso de herramientas con la API, organizadas por tema.
 
+## Fechas de los próximos apuntes
+
+Desde el 17 de noviembre de 2026, cada observación nueva llevará la fecha de
+la consulta y la fecha de su respuesta, en formato `AAAA-MM-DD`. Si la respuesta
+se completa otro día, se conservarán ambas fechas reales:
+
+**Consulta (AAAA-MM-DD):** pregunta u observación.
+
+**Respuesta (AAAA-MM-DD):** explicación breve y resultado del laboratorio, si corresponde.
+
+Los apuntes anteriores conservan la fecha del registro que los agrupa; no se les
+asignan fechas individuales que no quedaron documentadas.
+
 ## Registro al 10 de noviembre de 2026
 
 Se revisaron los conceptos siguientes a partir de `labs/pedidos.py` y
@@ -204,3 +217,70 @@ sigue siendo la [segunda práctica de la semana 1](semana-1.md#segunda-práctica
 Las próximas observaciones pueden agregarse como registros fechados, manteniendo
 las preguntas y sus explicaciones por tema. Los comandos y casos prácticos
 continúan en la guía del laboratorio.
+
+## Registro del 17 de noviembre de 2026 · segunda práctica
+
+**Consulta (2026-11-17):** ¿Qué quedó comprobado antes de preguntarle al modelo
+por el estado de un pedido?
+
+**Respuesta (2026-11-17):** Se ejecutaron los 13 tests del repositorio y pasaron.
+En el laboratorio local, `PED-002` devolvió `enviado` y `PED-999` devolvió
+`no encontrado`. La opción `--sin-permiso` rechazó la consulta y el nombre de
+herramienta `cancelar_pedido` fue rechazado por no estar permitido. El esquema
+JSON generado desde Pydantic exige `id` y prohíbe campos adicionales.
+
+Estos resultados comprueban el recorrido local y las respuestas simuladas de las
+pruebas. El siguiente paso fue hacer una consulta real con la API, que puede
+consumir saldo. Referencia: [Function calling de OpenAI](https://developers.openai.com/api/docs/guides/function-calling).
+
+**Consulta (2026-11-17):** ¿Qué respondió la API al preguntar por `PED-002`?
+
+**Respuesta (2026-11-17):** Con autorización para usar la API, se ejecutó
+`python -m labs.pedidos_api "¿Ya salió mi pedido PED-002?"`. El primer intento
+no pudo conectarse desde el entorno restringido. El segundo, con acceso de red,
+respondió: «¡Sí! Tu pedido **PED-002** ya fue enviado.» Coincide con el catálogo
+ficticio de Python. El comando solo imprime el texto final: esta ejecución
+confirma la conexión y la respuesta, pero no muestra si el modelo invocó la
+herramienta. Los tests verifican ese recorrido con respuestas simuladas.
+
+**Próximo paso registrado entonces:** hacer visible el `function_call` y el
+resultado local durante la ejecución, y comparar una pregunta con ID con otra
+sin ID. Así se podrá comprobar el flujo real sin inferirlo solo a partir del
+texto final.
+
+**Consulta (2026-11-17):** ¿Cómo distinguimos una respuesta directa de una
+respuesta construida después de ejecutar `consultar_estado_pedido`?
+
+**Respuesta (2026-11-17):** Se agregó `--mostrar-flujo` a `labs/pedidos_api.py`.
+La traza muestra la solicitud de la herramienta y su `call_id`, la validación y
+ejecución local en Python, y el envío del resultado al modelo. Si no hay llamada,
+lo indica expresamente. Las pruebas con respuestas simuladas comprueban ambos
+caminos. La consulta real anterior no tenía traza; por eso no permite saber si
+el modelo usó la herramienta en aquella ejecución.
+
+**Consulta (2026-11-17):** ¿Qué mostró una ejecución real con la traza activada?
+
+**Respuesta (2026-11-17):** Al repetir la pregunta por `PED-002` con
+`--mostrar-flujo`, el modelo solicitó `consultar_estado_pedido`. Python validó
+la solicitud, obtuvo `{"id": "PED-002", "estado": "enviado"}` del catálogo local y
+envió el resultado con el mismo `call_id`. El modelo respondió «¡Sí! Tu pedido
+**PED-002** ya fue enviado.» Esta vez quedó comprobado el recorrido completo.
+En ese momento, la comparación real con una pregunta sin ID quedó pendiente:
+la revisión automática exigió autorización específica para otra llamada con
+costo. El caso sin ID ya estaba cubierto por una prueba simulada.
+
+**Consulta (2026-11-17):** ¿Qué ocurrió en la comparación real al preguntar
+«¿Ya salió mi pedido?» sin indicar un ID?
+
+**Respuesta (2026-11-17):** Tras autorizar una llamada adicional, la traza mostró
+que el modelo respondió sin solicitar `consultar_estado_pedido`. Pidió el ID
+del pedido y explicó que debe tener el formato `PED-123`. Python no ejecutó la
+función ni envió un `function_call_output`; la ejecución terminó después de
+una sola solicitud. La comparación confirma que el modelo puede pedir el dato
+faltante antes de consultar el catálogo local.
+
+**Estado de la práctica:** se verificaron en vivo los dos caminos: con `PED-002`
+hubo llamada a la herramienta y respuesta basada en el resultado local; sin ID
+hubo una solicitud de aclaración. Los tests del repositorio siguen pasando.
+El siguiente punto del módulo es una herramienta de escritura ficticia que
+requiera confirmación antes de ejecutarse.

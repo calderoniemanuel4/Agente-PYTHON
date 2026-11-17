@@ -52,6 +52,18 @@ Desde la raíz, con el entorno virtual activo y `OPENAI_API_KEY` configurada:
 python -m labs.pedidos_api "¿Ya salió mi pedido PED-002?"
 ```
 
+Para ver los pasos del intercambio, agregá `--mostrar-flujo`:
+
+```bash
+python -m labs.pedidos_api "¿Ya salió mi pedido PED-002?" --mostrar-flujo
+```
+
+La traza indica si el modelo solicitó `consultar_estado_pedido`, el `call_id`
+que asocia la llamada con su resultado y cuándo Python validó y ejecutó la
+función. Muestra el resultado ficticio, sin imprimir la API key. La respuesta
+final aparece después de esos pasos. Si falta el ID, la traza permite comprobar
+si el modelo respondió sin solicitar la herramienta.
+
 Ahora escribís la pregunta. El modelo recibe la descripción de la herramienta
 y su esquema generado desde Pydantic. Si propone una llamada, Python la pasa
 a la misma función `ejecutar_propuesta` del primer ejercicio. El estado sale

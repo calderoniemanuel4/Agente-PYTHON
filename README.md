@@ -3,6 +3,8 @@ Un ejemplo de llamada a la Responses API de OpenAI desde Python.
 
 Para empezar el roadmap sin usar la API, seguí el [laboratorio de la semana 1](docs/semana-1.md).
 Las consultas del recorrido están en las [notas e informe de avance de la semana 1](docs/semana-1-notas.md).
+La segunda práctica permite ver el intercambio con la herramienta usando
+`python -m labs.pedidos_api "¿Ya salió mi pedido PED-002?" --mostrar-flujo`.
 
 ## Ejecución local
 
@@ -54,7 +56,8 @@ python -m unittest discover -s tests -v
 ```
 
 Las pruebas usan valores ficticios y simulan `responses.create`: verifican que los
-tres scripts carguen `.env` desde la raíz, la prioridad del entorno y el rechazo
-de claves ausentes o vacías, sin llamadas a la API. La autenticación real con
+scripts carguen `.env` desde la raíz, la prioridad del entorno, el rechazo de
+claves ausentes o vacías y los dos caminos del laboratorio de pedidos (con y sin
+llamada a la herramienta), sin llamadas a la API. La autenticación real con
 OpenAI se verifica por separado al ejecutar uno de los scripts.
 Postman no aplica: este proyecto se ejecuta por consola y no expone endpoints HTTP.
