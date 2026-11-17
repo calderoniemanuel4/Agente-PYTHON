@@ -1,14 +1,29 @@
 import io
 import json
+import subprocess
+import sys
 import unittest
 from contextlib import redirect_stderr
+from pathlib import Path
 from types import SimpleNamespace
 from unittest.mock import Mock, patch
 
 from labs.pedidos_api import preguntar
 
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+
 
 class PedidosAPITests(unittest.TestCase):
+    def test_direct_script_can_import_pedidos(self):
+        result = subprocess.run(
+            [sys.executable, str(PROJECT_ROOT / "labs" / "pedidos_api.py"), "--help"],
+            cwd=PROJECT_ROOT,
+            capture_output=True,
+            text=True,
+            check=True,
+        )
+        self.assertIn("--mostrar-flujo", result.stdout)
+
     def test_devuelve_estado_local_con_el_id_de_la_llamada(self):
         client = Mock()
         llamada = SimpleNamespace(type="function_call", name="consultar_estado_pedido",

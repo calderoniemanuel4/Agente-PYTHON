@@ -5,6 +5,7 @@ Para empezar el roadmap sin usar la API, seguí el [laboratorio de la semana 1](
 Las consultas del recorrido están en las [notas e informe de avance de la semana 1](docs/semana-1-notas.md).
 La segunda práctica permite ver el intercambio con la herramienta usando
 `python -m labs.pedidos_api "¿Ya salió mi pedido PED-002?" --mostrar-flujo`.
+También funciona `python labs/pedidos_api.py "¿Ya salió mi pedido PED-002?" --mostrar-flujo`.
 
 ## Ejecución local
 

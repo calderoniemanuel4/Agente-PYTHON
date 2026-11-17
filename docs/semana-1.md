@@ -52,6 +52,15 @@ Desde la raíz, con el entorno virtual activo y `OPENAI_API_KEY` configurada:
 python -m labs.pedidos_api "¿Ya salió mi pedido PED-002?"
 ```
 
+También podés ejecutarlo como archivo desde la raíz:
+
+```bash
+python labs/pedidos_api.py "¿Ya salió mi pedido PED-002?"
+```
+
+Ambas formas usan el mismo `.env` y el mismo código del laboratorio. La
+primera importa `labs` como paquete; la segunda ejecuta el archivo directamente.
+
 Para ver los pasos del intercambio, agregá `--mostrar-flujo`:
 
 ```bash

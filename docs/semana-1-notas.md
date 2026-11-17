@@ -284,3 +284,14 @@ hubo llamada a la herramienta y respuesta basada en el resultado local; sin ID
 hubo una solicitud de aclaración. Los tests del repositorio siguen pasando.
 El siguiente punto del módulo es una herramienta de escritura ficticia que
 requiera confirmación antes de ejecutarse.
+
+**Consulta (2026-11-17):** ¿Por qué `python labs/pedidos_api.py ...` fallaba con
+`ModuleNotFoundError: No module named 'labs'`?
+
+**Respuesta (2026-11-17):** Al ejecutar un archivo directamente, Python toma
+`labs/` como ubicación del script; el import absoluto `labs.pedidos` no se
+resuelve desde allí. Al usar `python -m labs.pedidos_api`, sí se ejecuta como
+módulo del paquete. El script ahora elige una importación relativa cuando se
+ejecuta como módulo y una importación local cuando se ejecuta como archivo.
+Ambas formas mostraron la ayuda correctamente y pasaron los 14 tests. Esta
+corrección no requirió una llamada a la API.

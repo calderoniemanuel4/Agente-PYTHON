@@ -10,7 +10,10 @@ from dotenv import load_dotenv
 from openai import APIConnectionError, APIStatusError, OpenAI
 from pydantic import ValidationError
 
-from labs.pedidos import ConsultaPedido, ejecutar_propuesta
+if __package__:
+    from .pedidos import ConsultaPedido, ejecutar_propuesta
+else:
+    from pedidos import ConsultaPedido, ejecutar_propuesta
 
 
 def preguntar(
